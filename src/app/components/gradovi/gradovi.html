@@ -1,0 +1,51 @@
+<div class="header-row">
+  <h1>Gradovi</h1>
+  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj grad</button>
+</div>
+
+@if (formaVidljiva) {
+  <form (ngSubmit)="sacuvaj()">
+    <label>Naziv grada</label>
+    <input
+      type="text"
+      [(ngModel)]="noviGrad.naziv"
+      name="naziv"
+      placeholder="npr. Beograd"
+      required
+    />
+    <div style="display: flex; gap: 1rem;">
+      <button type="submit" class="btn-success">
+        {{ editMode ? 'Sačuvaj izmene' : 'Dodaj' }}
+      </button>
+      <button type="button" class="btn-danger" (click)="zatvoriFormu()">
+        Otkaži
+      </button>
+    </div>
+  </form>
+}
+
+@if (gradovi.length === 0) {
+  <p>Nema gradova u bazi.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Naziv</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (grad of gradovi; track grad.id) {
+        <tr>
+          <td>{{ grad.id }}</td>
+          <td>{{ grad.naziv }}</td>
+          <td style="display: flex; gap: 0.5rem;">
+            <button class="btn-primary" (click)="uredi(grad)">Uredi</button>
+            <button class="btn-danger" (click)="obrisi(grad.id!)">Obriši</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

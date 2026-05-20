@@ -1,0 +1,114 @@
+<div class="header-row">
+  <h1>Koncerti</h1>
+  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj koncert</button>
+</div>
+
+@if (formaVidljiva) {
+  <form (ngSubmit)="sacuvaj()">
+    <label>Naziv koncerta</label>
+    <input
+      type="text"
+      [(ngModel)]="noviKoncert.naziv"
+      name="naziv"
+      placeholder="npr. Exit Festival"
+      required
+    />
+
+    <label>Datum</label>
+    <input
+      type="date"
+      [(ngModel)]="noviKoncert.datum"
+      name="datum"
+      required
+    />
+
+    <label>Vreme početka</label>
+    <input
+      type="time"
+      [(ngModel)]="noviKoncert.vremePocetka"
+      name="vremePocetka"
+      required
+    />
+
+    <label>Trajanje (minuti)</label>
+    <input
+      type="number"
+      [(ngModel)]="noviKoncert.vremeTrajanja"
+      name="vremeTrajanja"
+      placeholder="npr. 120"
+    />
+
+    <label>Status</label>
+    <select [(ngModel)]="noviKoncert.status" name="status">
+      @for (status of statusi; track status) {
+        <option [value]="status">{{ status }}</option>
+      }
+    </select>
+
+    <label>Lokacija</label>
+    <select
+      name="lokacija"
+      (change)="onLokacijaChange($any($event.target).value)"
+      required
+    >
+      <option value="">-- Izaberi lokaciju --</option>
+      @for (lokacija of lokacije; track lokacija.id) {
+        <option
+          [value]="lokacija.id"
+          [selected]="noviKoncert.lokacija?.id === lokacija.id"
+        >
+          {{ lokacija.naziv }} ({{ lokacija.grad.naziv }})
+        </option>
+      }
+    </select>
+
+    <div style="display: flex; gap: 1rem;">
+      <button type="submit" class="btn-success">
+        {{ editMode ? 'Sačuvaj izmene' : 'Dodaj' }}
+      </button>
+      <button type="button" class="btn-danger" (click)="zatvoriFormu()">
+        Otkaži
+      </button>
+    </div>
+  </form>
+}
+
+@if (koncerti.length === 0) {
+  <p>Nema koncerata u bazi.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Naziv</th>
+        <th>Datum</th>
+        <th>Vreme</th>
+        <th>Trajanje</th>
+        <th>Lokacija</th>
+        <th>Grad</th>
+        <th>Status</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (koncert of koncerti; track koncert.id) {
+        <tr>
+          <td>{{ koncert.naziv }}</td>
+          <td>{{ koncert.datum }}</td>
+          <td>{{ koncert.vremePocetka }}</td>
+          <td>{{ koncert.vremeTrajanja }} min</td>
+          <td>{{ koncert.lokacija.naziv }}</td>
+          <td>{{ koncert.lokacija.grad.naziv }}</td>
+          <td>
+            <span [style.color]="statusBoja(koncert.status)">
+              ● {{ koncert.status }}
+            </span>
+          </td>
+          <td style="display: flex; gap: 0.5rem;">
+            <button class="btn-primary" (click)="uredi(koncert)">Uredi</button>
+            <button class="btn-danger" (click)="obrisi(koncert.id!)">Obriši</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

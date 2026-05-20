@@ -1,0 +1,93 @@
+<div class="header-row">
+  <h1>Lokacije</h1>
+  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj lokaciju</button>
+</div>
+
+@if (formaVidljiva) {
+  <form (ngSubmit)="sacuvaj()">
+    <label>Naziv lokacije</label>
+    <input
+      type="text"
+      [(ngModel)]="novaLokacija.naziv"
+      name="naziv"
+      placeholder="npr. Štark Arena"
+      required
+    />
+
+    <label>Adresa</label>
+    <input
+      type="text"
+      [(ngModel)]="novaLokacija.adresa"
+      name="adresa"
+      placeholder="npr. Bulevar Arsenija Čarnojevića 58"
+      required
+    />
+
+    <label>Kapacitet</label>
+    <input
+      type="number"
+      [(ngModel)]="novaLokacija.kapacitet"
+      name="kapacitet"
+      placeholder="npr. 20000"
+      required
+    />
+
+    <label>Grad</label>
+    <select
+      name="grad"
+      (change)="onGradChange($any($event.target).value)"
+      required
+    >
+      <option value="">-- Izaberi grad --</option>
+      @for (grad of gradovi; track grad.id) {
+        <option
+          [value]="grad.id"
+          [selected]="novaLokacija.grad?.id === grad.id"
+        >
+          {{ grad.naziv }}
+        </option>
+      }
+    </select>
+
+    <div style="display: flex; gap: 1rem;">
+      <button type="submit" class="btn-success">
+        {{ editMode ? 'Sačuvaj izmene' : 'Dodaj' }}
+      </button>
+      <button type="button" class="btn-danger" (click)="zatvoriFormu()">
+        Otkaži
+      </button>
+    </div>
+  </form>
+}
+
+@if (lokacije.length === 0) {
+  <p>Nema lokacija u bazi.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Naziv</th>
+        <th>Adresa</th>
+        <th>Kapacitet</th>
+        <th>Grad</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (lokacija of lokacije; track lokacija.id) {
+        <tr>
+          <td>{{ lokacija.id }}</td>
+          <td>{{ lokacija.naziv }}</td>
+          <td>{{ lokacija.adresa }}</td>
+          <td>{{ lokacija.kapacitet }}</td>
+          <td>{{ lokacija.grad.naziv }}</td>
+          <td style="display: flex; gap: 0.5rem;">
+            <button class="btn-primary" (click)="uredi(lokacija)">Uredi</button>
+            <button class="btn-danger" (click)="obrisi(lokacija.id!)">Obriši</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
