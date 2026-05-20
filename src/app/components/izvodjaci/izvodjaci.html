@@ -1,0 +1,105 @@
+<div class="header-row">
+  <h1>Izvođači</h1>
+  <div style="display: flex; gap: 1rem;">
+    <button class="btn-primary" (click)="prikaziFormu('MUZICAR')">+ Dodaj muzičara</button>
+    <button class="btn-primary" (click)="prikaziFormu('BEND')">+ Dodaj bend</button>
+  </div>
+</div>
+
+@if (loading) {
+  <p>Učitavanje...</p>
+} @else {
+  @if (formaVidljiva) {
+    <form (ngSubmit)="sacuvaj()">
+      <label>Kontakt email</label>
+      <input
+        type="email"
+        [(ngModel)]="noviIzvodjac.kontaktEmail"
+        name="kontaktEmail"
+        placeholder="npr. info@bend.com"
+        required
+      />
+
+      @if (odabraniTip === 'MUZICAR') {
+        <label>Ime</label>
+        <input
+          type="text"
+          [(ngModel)]="noviIzvodjac.ime"
+          name="ime"
+          placeholder="npr. Marko"
+          required
+        />
+        <label>Prezime</label>
+        <input
+          type="text"
+          [(ngModel)]="noviIzvodjac.prezime"
+          name="prezime"
+          placeholder="npr. Marković"
+          required
+        />
+        <label>Pol</label>
+        <select [(ngModel)]="noviIzvodjac.pol" name="pol">
+          <option value="M">Muški</option>
+          <option value="Z">Ženski</option>
+        </select>
+      } @else {
+        <label>Naziv benda</label>
+        <input
+          type="text"
+          [(ngModel)]="noviIzvodjac.naziv"
+          name="naziv"
+          placeholder="npr. Riblja Čorba"
+          required
+        />
+        <label>Broj članova</label>
+        <input
+          type="number"
+          [(ngModel)]="noviIzvodjac.brojClanova"
+          name="brojClanova"
+          placeholder="npr. 4"
+          required
+        />
+      }
+
+      <div style="display: flex; gap: 1rem;">
+        <button type="submit" class="btn-success">Dodaj</button>
+        <button type="button" class="btn-danger" (click)="zatvoriFormu()">Otkaži</button>
+      </div>
+    </form>
+  }
+
+  @if (izvodjaci.length === 0) {
+    <p>Nema izvođača u bazi.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tip</th>
+          <th>Ime / Naziv</th>
+          <th>Email</th>
+          <th>Akcije</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (izvodjac of izvodjaci; track izvodjac.id) {
+          <tr>
+            <td>{{ izvodjac.id }}</td>
+            <td>{{ izvodjac.tip }}</td>
+            <td>
+              @if (izvodjac.tip === 'MUZICAR') {
+                {{ izvodjac.ime }} {{ izvodjac.prezime }}
+              } @else {
+                {{ izvodjac.naziv }}
+              }
+            </td>
+            <td>{{ izvodjac.kontaktEmail }}</td>
+            <td>
+              <button class="btn-danger" (click)="obrisi(izvodjac.id!)">Obriši</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

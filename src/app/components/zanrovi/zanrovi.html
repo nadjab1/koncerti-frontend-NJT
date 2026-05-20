@@ -1,0 +1,50 @@
+<div class="header-row">
+  <h1>Žanrovi</h1>
+  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj žanr</button>
+</div>
+
+@if (loading) {
+  <p>Učitavanje...</p>
+} @else {
+  @if (formaVidljiva) {
+    <form (ngSubmit)="sacuvaj()">
+      <label>Naziv žanra</label>
+      <input
+        type="text"
+        [(ngModel)]="noviZanr.naziv"
+        name="naziv"
+        placeholder="npr. Rock"
+        required
+      />
+      <div style="display: flex; gap: 1rem;">
+        <button type="submit" class="btn-success">Dodaj</button>
+        <button type="button" class="btn-danger" (click)="formaVidljiva = false">Otkaži</button>
+      </div>
+    </form>
+  }
+
+  @if (zanrovi.length === 0) {
+    <p>Nema žanrova u bazi.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Naziv</th>
+          <th>Akcije</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (zanr of zanrovi; track zanr.id) {
+          <tr>
+            <td>{{ zanr.id }}</td>
+            <td>{{ zanr.naziv }}</td>
+            <td>
+              <button class="btn-danger" (click)="obrisi(zanr.id!)">Obriši</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

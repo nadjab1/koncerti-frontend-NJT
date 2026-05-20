@@ -1,0 +1,84 @@
+<div class="header-row">
+  <h1>Karte</h1>
+</div>
+
+<div style="margin-bottom: 1.5rem;">
+  <label>Izaberi koncert</label>
+  <select (change)="onKoncertChange($any($event.target).value)" style="margin-top: 0.5rem;">
+    <option value="">-- Izaberi koncert --</option>
+    @for (koncert of koncerti; track koncert.id) {
+      <option [value]="koncert.id">
+        {{ koncert.naziv }} — {{ koncert.datum }} ({{ koncert.lokacija.naziv }})
+      </option>
+    }
+  </select>
+</div>
+
+@if (kupovinaVidljiva) {
+  <form (ngSubmit)="kupi()">
+    <label>Ime kupca</label>
+    <input
+      type="text"
+      [(ngModel)]="kupovina.imeKupca"
+      name="imeKupca"
+      placeholder="npr. Marko Marković"
+      required
+    />
+    <label>Email kupca</label>
+    <input
+      type="email"
+      [(ngModel)]="kupovina.emailKupca"
+      name="emailKupca"
+      placeholder="npr. marko@email.com"
+      required
+    />
+    <div style="display: flex; gap: 1rem;">
+      <button type="submit" class="btn-success">Kupi</button>
+      <button type="button" class="btn-danger" (click)="kupovinaVidljiva = false">Otkaži</button>
+    </div>
+  </form>
+}
+
+@if (loading) {
+  <p>Učitavanje karata...</p>
+} @else if (odabraniKoncertId && karte.length === 0) {
+  <p>Nema karata za ovaj koncert.</p>
+} @else if (karte.length > 0) {
+  <table>
+    <thead>
+      <tr>
+        <th>Red</th>
+        <th>Sedište</th>
+        <th>Cena</th>
+        <th>Status</th>
+        <th>Kupac</th>
+        <th>Datum prodaje</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (karta of karte; track karta.id) {
+        <tr>
+          <td>{{ karta.red }}</td>
+          <td>{{ karta.sediste }}</td>
+          <td>{{ karta.cena }} RSD</td>
+          <td>
+            <span [style.color]="statusBoja(karta.status)">
+              ● {{ karta.status }}
+            </span>
+          </td>
+          <td>{{ karta.imeKupca || '-' }}</td>
+          <td>{{ karta.datumProdaje || '-' }}</td>
+          <td style="display: flex; gap: 0.5rem;">
+            @if (karta.status === 'DOSTUPNA') {
+              <button class="btn-success" (click)="prikaziKupovinu(karta.id!)">Kupi</button>
+            }
+            @if (karta.status === 'PRODATA') {
+              <button class="btn-danger" (click)="storniraj(karta.id!)">Storniraj</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
