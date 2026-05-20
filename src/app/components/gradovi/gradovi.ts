@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Grad } from '../../models/grad.model';
 import { GradService } from '../../services/grad.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-gradovi',
@@ -15,19 +16,34 @@ export class GradoviComponent implements OnInit {
   gradovi: Grad[] = [];
   formaVidljiva = false;
   editMode = false;
+  loading = true;
 
   noviGrad: Grad = { naziv: '' };
   odabraniGrad: Grad | null = null;
 
-  constructor(private gradService: GradService) {}
+  constructor(
+    private gradService: GradService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.ucitajGradove();
   }
 
   ucitajGradove(): void {
-    this.gradService.findAll().subscribe(data => {
-      this.gradovi = data;
+    this.loading = true;
+    this.gradService.findAll().subscribe({
+      next: data => {
+        this.gradovi = data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.notificationService.error('Greška pri učitavanju gradova. Proverite da li je backend pokrenut.');
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -39,29 +55,47 @@ export class GradoviComponent implements OnInit {
 
   sacuvaj(): void {
     if (this.editMode && this.odabraniGrad?.id) {
-      this.gradService.update(this.odabraniGrad.id, this.noviGrad).subscribe(() => {
-        this.ucitajGradove();
-        this.zatvoriFormu();
+      this.gradService.update(this.odabraniGrad.id, this.noviGrad).subscribe({
+        next: () => {
+          this.notificationService.success('Grad uspešno izmenjen!');
+          this.ucitajGradove();
+          this.zatvoriFormu();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri izmeni grada.');
+        }
       });
     } else {
-      this.gradService.save(this.noviGrad).subscribe(() => {
-        this.ucitajGradove();
-        this.zatvoriFormu();
+      this.gradService.save(this.noviGrad).subscribe({
+        next: () => {
+          this.notificationService.success('Grad uspešno dodat!');
+          this.ucitajGradove();
+          this.zatvoriFormu();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri dodavanju grada.');
+        }
       });
     }
   }
 
   uredi(grad: Grad): void {
     this.odabraniGrad = grad;
-    this.noviGrad = { ...grad };  // kopija objekta da ne menjamo original
+    this.noviGrad = { ...grad };
     this.editMode = true;
     this.formaVidljiva = true;
   }
 
   obrisi(id: number): void {
     if (confirm('Da li ste sigurni da želite da obrišete ovaj grad?')) {
-      this.gradService.delete(id).subscribe(() => {
-        this.ucitajGradove();
+      this.gradService.delete(id).subscribe({
+        next: () => {
+          this.notificationService.success('Grad uspešno obrisan!');
+          this.ucitajGradove();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri brisanju grada. Možda ima lokacije vezane za njega.');
+        }
       });
     }
   }

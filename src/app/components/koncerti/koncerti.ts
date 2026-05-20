@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Koncert } from '../../models/koncert.model';
 import { Lokacija } from '../../models/lokacija.model';
 import { KoncertService } from '../../services/koncert.service';
 import { LokacijaService } from '../../services/lokacija.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-koncerti',
@@ -18,6 +19,7 @@ export class KoncertiComponent implements OnInit {
   lokacije: Lokacija[] = [];
   formaVidljiva = false;
   editMode = false;
+  loading = true;
 
   noviKoncert: Koncert = {
     naziv: '',
@@ -33,7 +35,9 @@ export class KoncertiComponent implements OnInit {
 
   constructor(
     private koncertService: KoncertService,
-    private lokacijaService: LokacijaService
+    private lokacijaService: LokacijaService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -42,14 +46,30 @@ export class KoncertiComponent implements OnInit {
   }
 
   ucitajKoncerte(): void {
-    this.koncertService.findAll().subscribe(data => {
-      this.koncerti = data;
+    this.loading = true;
+    this.koncertService.findAll().subscribe({
+      next: data => {
+        this.koncerti = data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.notificationService.error('Greška pri učitavanju koncerata. Proverite da li je backend pokrenut.');
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
   ucitajLokacije(): void {
-    this.lokacijaService.findAll().subscribe(data => {
-      this.lokacije = data;
+    this.lokacijaService.findAll().subscribe({
+      next: data => {
+        this.lokacije = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.notificationService.error('Greška pri učitavanju lokacija.');
+      }
     });
   }
 
@@ -75,14 +95,26 @@ export class KoncertiComponent implements OnInit {
 
   sacuvaj(): void {
     if (this.editMode && this.odabraniKoncert?.id) {
-      this.koncertService.update(this.odabraniKoncert.id, this.noviKoncert).subscribe(() => {
-        this.ucitajKoncerte();
-        this.zatvoriFormu();
+      this.koncertService.update(this.odabraniKoncert.id, this.noviKoncert).subscribe({
+        next: () => {
+          this.notificationService.success('Koncert uspešno izmenjen!');
+          this.ucitajKoncerte();
+          this.zatvoriFormu();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri izmeni koncerta.');
+        }
       });
     } else {
-      this.koncertService.save(this.noviKoncert).subscribe(() => {
-        this.ucitajKoncerte();
-        this.zatvoriFormu();
+      this.koncertService.save(this.noviKoncert).subscribe({
+        next: () => {
+          this.notificationService.success('Koncert uspešno dodat!');
+          this.ucitajKoncerte();
+          this.zatvoriFormu();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri dodavanju koncerta. Moguće da je termin zauzet.');
+        }
       });
     }
   }
@@ -99,8 +131,14 @@ export class KoncertiComponent implements OnInit {
 
   obrisi(id: number): void {
     if (confirm('Da li ste sigurni da želite da obrišete ovaj koncert?')) {
-      this.koncertService.delete(id).subscribe(() => {
-        this.ucitajKoncerte();
+      this.koncertService.delete(id).subscribe({
+        next: () => {
+          this.notificationService.success('Koncert uspešno obrisan!');
+          this.ucitajKoncerte();
+        },
+        error: () => {
+          this.notificationService.error('Greška pri brisanju koncerta.');
+        }
       });
     }
   }
