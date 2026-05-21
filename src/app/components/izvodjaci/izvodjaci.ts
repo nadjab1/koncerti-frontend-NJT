@@ -89,4 +89,14 @@ export class IzvodjaciComponent implements OnInit {
     this.formaVidljiva = false;
     this.noviIzvodjac = { kontaktEmail: '', tip: 'MUZICAR' };
   }
+
+  izvodjacNaziv(izvodjac: Izvodjac): string {
+    if (izvodjac.ime && izvodjac.prezime) {
+      return `${izvodjac.ime} ${izvodjac.prezime}`;
+    }
+    if (izvodjac.naziv) {
+      return izvodjac.naziv;
+    }
+    return 'Nepoznat izvođač';
+  }
 }

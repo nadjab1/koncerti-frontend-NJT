@@ -32,6 +32,10 @@ export class KoncertService {
     return this.http.put<Koncert>(`${this.apiUrl}/${id}`, koncert);
   }
 
+  updateIzvodjaci(id: number, izvodjacIds: number[]): Observable<Koncert> {
+    return this.http.put<Koncert>(`${this.apiUrl}/${id}/izvodjaci`, izvodjacIds);
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

@@ -1,4 +1,5 @@
 import { Lokacija } from './lokacija.model';
+import { Izvodjac } from './izvodjac.model';
 
 export interface Koncert {
   id?: number;
@@ -8,5 +9,5 @@ export interface Koncert {
   vremeTrajanja?: number;
   status: 'PLANIRAN' | 'AKTIVAN' | 'OTKAZAN' | 'ZAVRSEN';
   lokacija: Lokacija;
-  izvodjaci?: any[];
+  izvodjaci?: Izvodjac[];
 }

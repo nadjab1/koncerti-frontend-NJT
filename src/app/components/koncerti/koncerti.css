@@ -1,0 +1,62 @@
+.izvodjaci-dropdown {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  position: relative;
+}
+
+.dropdown-header {
+  padding: 0.625rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.dropdown-header:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-lista {
+  border-top: 1px solid #ddd;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-weight: normal;
+  width: 100%;
+}
+
+.dropdown-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.dropdown-item span {
+  flex: 1;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.tip-badge {
+  margin-left: auto;
+  font-size: 0.50rem;
+  color: rgb(85, 83, 83);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}

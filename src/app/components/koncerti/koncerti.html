@@ -65,6 +65,33 @@
         }
       </select>
 
+      <label>Izvođači</label>
+      <div class="izvodjaci-dropdown">
+        <div class="dropdown-header" (click)="dropdownOtvoren = !dropdownOtvoren">
+          @if (odabraniIzvodjacIds.length === 0) {
+            <span>-- Izaberi izvođače --</span>
+          } @else {
+            <span>Odabrano: {{ odabraniIzvodjacIds.length }}</span>
+          }
+          <span>{{ dropdownOtvoren ? '▲' : '▼' }}</span>
+        </div>
+        @if (dropdownOtvoren) {
+          <div class="dropdown-lista">
+            @for (izvodjac of izvodjaci; track izvodjac.id) {
+              <label class="dropdown-item">
+                <input
+                  type="checkbox"
+                  [checked]="jeOdabran(izvodjac.id!)"
+                  (change)="onIzvodjacToggle(izvodjac.id!, $event)"
+                />
+                {{ izvodjacNaziv(izvodjac) }}
+                <span class="tip-badge">{{ izvodjac.tip }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
       <div style="display: flex; gap: 1rem;">
         <button type="submit" class="btn-success">
           {{ editMode ? 'Sačuvaj izmene' : 'Dodaj' }}
@@ -89,6 +116,7 @@
           <th>Lokacija</th>
           <th>Grad</th>
           <th>Status</th>
+          <th>Izvođači</th>
           <th>Akcije</th>
         </tr>
       </thead>
@@ -105,6 +133,17 @@
               <span [style.color]="statusBoja(koncert.status)">
                 ● {{ koncert.status }}
               </span>
+            </td>
+            <td>
+              @if (koncert.izvodjaci && koncert.izvodjaci.length > 0) {
+                @for (i of koncert.izvodjaci; track i.id) {
+                  <span style="display: block; font-size: 0.85rem;">
+                    {{ izvodjacNaziv(i) }}
+                  </span>
+                }
+              } @else {
+                <span style="color: #aaa;">Nema</span>
+              }
             </td>
             <td style="display: flex; gap: 0.5rem;">
               <button class="btn-primary" (click)="uredi(koncert)">Uredi</button>

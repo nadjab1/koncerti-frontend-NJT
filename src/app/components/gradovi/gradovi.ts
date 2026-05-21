@@ -35,13 +35,11 @@ export class GradoviComponent implements OnInit {
     this.loading = true;
     this.gradService.findAll().subscribe({
       next: data => {
-        console.log('Gradovi:', data);
         this.gradovi = data;
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.log('Greska:', err);
+      error: () => {
         this.notificationService.error('Greška pri učitavanju gradova. Proverite da li je backend pokrenut.');
         this.loading = false;
         this.cdr.detectChanges();

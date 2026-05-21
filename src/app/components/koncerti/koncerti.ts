@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Koncert } from '../../models/koncert.model';
 import { Lokacija } from '../../models/lokacija.model';
+import { Izvodjac } from '../../models/izvodjac.model';
 import { KoncertService } from '../../services/koncert.service';
 import { LokacijaService } from '../../services/lokacija.service';
+import { IzvodjacService } from '../../services/izvodjac.service';
 import { NotificationService } from '../../services/notification.service';
 
 @Component({
@@ -17,9 +19,11 @@ export class KoncertiComponent implements OnInit {
 
   koncerti: Koncert[] = [];
   lokacije: Lokacija[] = [];
+  izvodjaci: Izvodjac[] = [];
   formaVidljiva = false;
   editMode = false;
   loading = true;
+  dropdownOtvoren = false;
 
   noviKoncert: Koncert = {
     naziv: '',
@@ -27,15 +31,18 @@ export class KoncertiComponent implements OnInit {
     vremePocetka: '',
     vremeTrajanja: 0,
     status: 'PLANIRAN',
-    lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } }
+    lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } },
+    izvodjaci: []
   };
   odabraniKoncert: Koncert | null = null;
+  odabraniIzvodjacIds: number[] = [];
 
   statusi = ['PLANIRAN', 'AKTIVAN', 'OTKAZAN', 'ZAVRSEN'];
 
   constructor(
     private koncertService: KoncertService,
     private lokacijaService: LokacijaService,
+    private izvodjacService: IzvodjacService,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -43,6 +50,7 @@ export class KoncertiComponent implements OnInit {
   ngOnInit(): void {
     this.ucitajKoncerte();
     this.ucitajLokacije();
+    this.ucitajIzvodjace();
   }
 
   ucitajKoncerte(): void {
@@ -54,7 +62,7 @@ export class KoncertiComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.notificationService.error('Greška pri učitavanju koncerata. Proverite da li je backend pokrenut.');
+        this.notificationService.error('Greška pri učitavanju koncerata.');
         this.loading = false;
         this.cdr.detectChanges();
       }
@@ -73,16 +81,31 @@ export class KoncertiComponent implements OnInit {
     });
   }
 
+  ucitajIzvodjace(): void {
+    this.izvodjacService.findAll().subscribe({
+      next: data => {
+        this.izvodjaci = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.notificationService.error('Greška pri učitavanju izvođača.');
+      }
+    });
+  }
+
   prikaziFormu(): void {
     this.formaVidljiva = true;
     this.editMode = false;
+    this.dropdownOtvoren = false;
+    this.odabraniIzvodjacIds = [];
     this.noviKoncert = {
       naziv: '',
       datum: '',
       vremePocetka: '',
       vremeTrajanja: 0,
       status: 'PLANIRAN',
-      lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } }
+      lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } },
+      izvodjaci: []
     };
   }
 
@@ -93,13 +116,36 @@ export class KoncertiComponent implements OnInit {
     }
   }
 
+  onIzvodjacToggle(id: number, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.odabraniIzvodjacIds = [...this.odabraniIzvodjacIds, id];
+    } else {
+      this.odabraniIzvodjacIds = this.odabraniIzvodjacIds.filter(i => i !== id);
+    }
+  }
+
+  jeOdabran(id: number): boolean {
+    return this.odabraniIzvodjacIds.includes(id);
+  }
+
   sacuvaj(): void {
     if (this.editMode && this.odabraniKoncert?.id) {
       this.koncertService.update(this.odabraniKoncert.id, this.noviKoncert).subscribe({
-        next: () => {
-          this.notificationService.success('Koncert uspešno izmenjen!');
-          this.ucitajKoncerte();
-          this.zatvoriFormu();
+        next: (sacuvan) => {
+          if (this.odabraniIzvodjacIds.length > 0) {
+            this.koncertService.updateIzvodjaci(sacuvan.id!, this.odabraniIzvodjacIds).subscribe({
+              next: () => {
+                this.notificationService.success('Koncert uspešno izmenjen!');
+                this.ucitajKoncerte();
+                this.zatvoriFormu();
+              }
+            });
+          } else {
+            this.notificationService.success('Koncert uspešno izmenjen!');
+            this.ucitajKoncerte();
+            this.zatvoriFormu();
+          }
         },
         error: () => {
           this.notificationService.error('Greška pri izmeni koncerta.');
@@ -107,10 +153,20 @@ export class KoncertiComponent implements OnInit {
       });
     } else {
       this.koncertService.save(this.noviKoncert).subscribe({
-        next: () => {
-          this.notificationService.success('Koncert uspešno dodat!');
-          this.ucitajKoncerte();
-          this.zatvoriFormu();
+        next: (sacuvan) => {
+          if (this.odabraniIzvodjacIds.length > 0) {
+            this.koncertService.updateIzvodjaci(sacuvan.id!, this.odabraniIzvodjacIds).subscribe({
+              next: () => {
+                this.notificationService.success('Koncert uspešno dodat!');
+                this.ucitajKoncerte();
+                this.zatvoriFormu();
+              }
+            });
+          } else {
+            this.notificationService.success('Koncert uspešno dodat!');
+            this.ucitajKoncerte();
+            this.zatvoriFormu();
+          }
         },
         error: () => {
           this.notificationService.error('Greška pri dodavanju koncerta. Moguće da je termin zauzet.');
@@ -125,8 +181,10 @@ export class KoncertiComponent implements OnInit {
       ...koncert,
       lokacija: { ...koncert.lokacija }
     };
+    this.odabraniIzvodjacIds = koncert.izvodjaci?.map(i => i.id!) || [];
     this.editMode = true;
     this.formaVidljiva = true;
+    this.dropdownOtvoren = false;
   }
 
   obrisi(id: number): void {
@@ -147,13 +205,16 @@ export class KoncertiComponent implements OnInit {
     this.formaVidljiva = false;
     this.editMode = false;
     this.odabraniKoncert = null;
+    this.odabraniIzvodjacIds = [];
+    this.dropdownOtvoren = false;
     this.noviKoncert = {
       naziv: '',
       datum: '',
       vremePocetka: '',
       vremeTrajanja: 0,
       status: 'PLANIRAN',
-      lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } }
+      lokacija: { naziv: '', adresa: '', kapacitet: 0, grad: { naziv: '' } },
+      izvodjaci: []
     };
   }
 
@@ -165,5 +226,15 @@ export class KoncertiComponent implements OnInit {
       case 'ZAVRSEN': return '#95a5a6';
       default: return '#333';
     }
+  }
+
+  izvodjacNaziv(izvodjac: Izvodjac): string {
+    if (izvodjac.ime && izvodjac.prezime) {
+      return `${izvodjac.ime} ${izvodjac.prezime}`;
+    }
+    if (izvodjac.naziv) {
+      return izvodjac.naziv;
+    }
+    return 'Nepoznat izvođač';
   }
 }
