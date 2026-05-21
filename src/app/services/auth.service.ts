@@ -14,10 +14,14 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface AuthResponse {
   token: string;
-  korisnik: Korisnik;
+  id: number;
+  ime: string;
+  prezime: string;
+  email: string;
 }
+
 export interface RegistracijaRequest {
   ime: string;
   prezime: string;
@@ -40,22 +44,35 @@ export class AuthService {
   ulogovan = computed(() => this._korisnik() !== null);
 
   constructor(private http: HttpClient) {}
-  
-  login(podaci: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, podaci).pipe(
+
+  login(podaci: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, podaci).pipe(
       tap(odgovor => {
-        this.sacuvajKorisnika(odgovor.korisnik, odgovor.token);
+        const korisnik: Korisnik = {
+          id: odgovor.id,
+          ime: odgovor.ime,
+          prezime: odgovor.prezime,
+          email: odgovor.email
+        };
+        this.sacuvajKorisnika(korisnik, odgovor.token);
       })
     );
   }
 
-  registracija(podaci: RegistracijaRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/registracija`, podaci).pipe(
+  registracija(podaci: RegistracijaRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/registracija`, podaci).pipe(
       tap(odgovor => {
-        this.sacuvajKorisnika(odgovor.korisnik, 'ok');
+        const korisnik: Korisnik = {
+          id: odgovor.id,
+          ime: odgovor.ime,
+          prezime: odgovor.prezime,
+          email: odgovor.email
+        };
+        this.sacuvajKorisnika(korisnik, odgovor.token);
       })
     );
   }
+
   logout(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.TOKEN_KEY);
