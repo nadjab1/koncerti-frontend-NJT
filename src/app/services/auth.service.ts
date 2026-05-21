@@ -4,20 +4,25 @@ import { Observable, tap } from 'rxjs';
 
 export interface Korisnik {
   id?: number;
-  username: string;
   ime?: string;
   prezime?: string;
   email?: string;
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface LoginResponse {
   token: string;
   korisnik: Korisnik;
+}
+export interface RegistracijaRequest {
+  ime: string;
+  prezime: string;
+  email: string;
+  password: string;
 }
 
 @Injectable({
@@ -35,7 +40,7 @@ export class AuthService {
   ulogovan = computed(() => this._korisnik() !== null);
 
   constructor(private http: HttpClient) {}
-
+  
   login(podaci: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, podaci).pipe(
       tap(odgovor => {
@@ -44,6 +49,13 @@ export class AuthService {
     );
   }
 
+  registracija(podaci: RegistracijaRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/registracija`, podaci).pipe(
+      tap(odgovor => {
+        this.sacuvajKorisnika(odgovor.korisnik, 'ok');
+      })
+    );
+  }
   logout(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.TOKEN_KEY);

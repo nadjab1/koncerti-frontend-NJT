@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService, LoginRequest } from '../services/auth.service';
+import { AuthService, LoginRequest, RegistracijaRequest } from '../services/auth.service';
 import { Location } from '@angular/common';
+
 @Component({
   selector: 'app-login',
   imports: [CommonModule, FormsModule],
@@ -12,51 +13,78 @@ import { Location } from '@angular/common';
 })
 export class LoginComponent {
 
-  podaci: LoginRequest = {
-    username: '',
-    password: ''
-  };
+  rezim: 'login' | 'registracija' = 'login';
+
+  loginPodaci: LoginRequest = { email: '', password: '' };
+  regPodaci: RegistracijaRequest = { ime: '', prezime: '', email: '', password: '' };
 
   loading = false;
-  greska: string | null = null;
+  greska: string = '';
   lozinkaPrikazana = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private cdr: ChangeDetectorRef
   ) {
     if (this.authService.ulogovan()) {
       this.router.navigate(['/']);
     }
   }
+
   prijavi(): void {
-    if (!this.podaci.username || !this.podaci.password) {
-      this.greska = 'Unesite korisničko ime i lozinku.';
+    if (!this.loginPodaci.email || !this.loginPodaci.password) {
+      this.greska = 'Unesite email i lozinku.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.loading = true;
-    this.greska = null;
+    this.greska = '';
 
-    this.authService.login(this.podaci).subscribe({
+    this.authService.login(this.loginPodaci).subscribe({
       next: () => {
-        this.location.back();
+        this.loading = false;
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading = false;
-        if (err.status === 401) {
-          this.greska = 'Pogrešno korisničko ime ili lozinka.';
-        } else if (err.status === 0) {
-          this.greska = 'Ne može se povezati sa serverom. Proverite da li je backend pokrenut.';
-        } else {
-          this.greska = 'Greška pri prijavi. Pokušajte ponovo.';
-        }
+        this.greska = err.status === 401 ? 'Pogrešan email ili lozinka.' : 'Greška pri prijavi.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  registruj(): void {
+    if (!this.regPodaci.ime || !this.regPodaci.prezime || !this.regPodaci.email || !this.regPodaci.password) {
+      this.greska = 'Sva polja su obavezna.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.loading = true;
+    this.greska = '';
+
+    this.authService.registracija(this.regPodaci).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.greska = err.status === 400 ? 'Email je već zauzet.' : 'Greška pri registraciji.';
+        this.cdr.detectChanges();
       }
     });
   }
 
   toggleLozinka(): void {
     this.lozinkaPrikazana = !this.lozinkaPrikazana;
+  }
+
+  prebaci(r: 'login' | 'registracija'): void {
+    this.rezim = r;
+    this.greska = '';
   }
 }

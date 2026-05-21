@@ -152,3 +152,29 @@ form {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+.tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #888;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tabs button.active {
+  color: #e94560;
+  border-bottom-color: #e94560;
+  font-weight: 600;
+}

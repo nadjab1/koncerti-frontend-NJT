@@ -11,7 +11,9 @@
   </div>
   <div class="nav-user">
     @if (authService.ulogovan()) {
-      <span class="korisnik-info">👤 {{ authService.korisnik()?.ime || authService.korisnik()?.username }}</span>
+  <span class="korisnik-info">
+    👤 {{ authService.korisnik()?.ime }}
+  </span>
       <button class="btn-odjava" (click)="odjavi()">Odjavi se</button>
     } @else {
       <a routerLink="/login" class="btn-login">Prijavi se</a>
