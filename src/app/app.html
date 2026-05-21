@@ -1,12 +1,22 @@
 <app-notification />
 
 <nav>
-  <a routerLink="/gradovi" routerLinkActive="active">Gradovi</a>
-  <a routerLink="/lokacije" routerLinkActive="active">Lokacije</a>
-  <a routerLink="/koncerti" routerLinkActive="active">Koncerti</a>
-  <a routerLink="/zanrovi" routerLinkActive="active">Žanrovi</a>
-  <a routerLink="/izvodjaci" routerLinkActive="active">Izvođači</a>
-  <a routerLink="/karte" routerLinkActive="active">Karte</a>
+  <div class="nav-links">
+    <a routerLink="/gradovi" routerLinkActive="active">Gradovi</a>
+    <a routerLink="/lokacije" routerLinkActive="active">Lokacije</a>
+    <a routerLink="/koncerti" routerLinkActive="active">Koncerti</a>
+    <a routerLink="/zanrovi" routerLinkActive="active">Žanrovi</a>
+    <a routerLink="/izvodjaci" routerLinkActive="active">Izvođači</a>
+    <a routerLink="/karte" routerLinkActive="active">Karte</a>
+  </div>
+  <div class="nav-user">
+    @if (authService.ulogovan()) {
+      <span class="korisnik-info">👤 {{ authService.korisnik()?.ime || authService.korisnik()?.username }}</span>
+      <button class="btn-odjava" (click)="odjavi()">Odjavi se</button>
+    } @else {
+      <a routerLink="/login" class="btn-login">Prijavi se</a>
+    }
+  </div>
 </nav>
 
 <main>

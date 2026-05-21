@@ -1,0 +1,58 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <p>Prijavite se na vaš nalog</p>
+    </div>
+
+    <form (ngSubmit)="prijavi()" #loginForm="ngForm">
+
+      <div class="form-group">
+        <label for="username">Korisničko ime</label>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          [(ngModel)]="podaci.username"
+          placeholder="Unesite korisničko ime"
+          autocomplete="username"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Lozinka</label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="lozinkaPrikazana ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="podaci.password"
+            placeholder="Unesite lozinku"
+            autocomplete="current-password"
+            [disabled]="loading"
+            required
+          />
+          <button type="button" class="toggle-lozinka" (click)="toggleLozinka()" tabindex="-1">
+            {{ lozinkaPrikazana ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      @if (greska) {
+        <div class="greska-poruka">
+          ⚠️ {{ greska }}
+        </div>
+      }
+
+      <button type="submit" class="btn-prijava" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span> Prijavljivanje...
+        } @else {
+          Prijavi se
+        }
+      </button>
+
+    </form>
+  </div>
+</div>
