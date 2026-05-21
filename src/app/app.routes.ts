@@ -7,14 +7,15 @@ import { IzvodjaciComponent } from './components/izvodjaci/izvodjaci';
 import { KarteComponent } from './components/karte/karte';
 import { LoginComponent } from './login/login';
 import { HomeComponent } from './components/home/home';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'gradovi', component: GradoviComponent },
-  { path: 'lokacije', component: LokacijeComponent },
-  { path: 'koncerti', component: KoncertiComponent },
-  { path: 'zanrovi', component: ZanroviComponent },
-  { path: 'izvodjaci', component: IzvodjaciComponent },
-  { path: 'karte', component: KarteComponent },
-  { path: '', component: HomeComponent }
+  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'gradovi', component: GradoviComponent, canActivate: [authGuard] },
+  { path: 'lokacije', component: LokacijeComponent, canActivate: [authGuard] },
+  { path: 'koncerti', component: KoncertiComponent, canActivate: [authGuard] },
+  { path: 'zanrovi', component: ZanroviComponent, canActivate: [authGuard] },
+  { path: 'izvodjaci', component: IzvodjaciComponent, canActivate: [authGuard] },
+  { path: 'karte', component: KarteComponent, canActivate: [authGuard] },
 ];
