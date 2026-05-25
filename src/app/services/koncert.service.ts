@@ -39,4 +39,12 @@ export class KoncertService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  generisiKarte(id: number, cena: number): Observable<any> {
+      return this.http.post(
+          `${this.apiUrl}/${id}/generisi-karte?cena=${cena}`,
+          {}
+      );
+  }
+
 }

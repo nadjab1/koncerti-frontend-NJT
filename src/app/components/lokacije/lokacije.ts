@@ -6,6 +6,7 @@ import { Grad } from '../../models/grad.model';
 import { LokacijaService } from '../../services/lokacija.service';
 import { GradService } from '../../services/grad.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-lokacije',
@@ -33,7 +34,8 @@ export class LokacijeComponent implements OnInit {
     private lokacijaService: LokacijaService,
     private gradService: GradService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {

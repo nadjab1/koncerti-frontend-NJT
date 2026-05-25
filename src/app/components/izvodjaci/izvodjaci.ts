@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IzvodjacService, Izvodjac } from '../../services/izvodjac.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-izvodjaci',
@@ -25,7 +26,8 @@ export class IzvodjaciComponent implements OnInit {
   constructor(
     private izvodjacService: IzvodjacService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {

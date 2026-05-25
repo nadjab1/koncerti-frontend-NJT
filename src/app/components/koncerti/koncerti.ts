@@ -8,6 +8,7 @@ import { KoncertService } from '../../services/koncert.service';
 import { LokacijaService } from '../../services/lokacija.service';
 import { IzvodjacService } from '../../services/izvodjac.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-koncerti',
@@ -24,6 +25,9 @@ export class KoncertiComponent implements OnInit {
   editMode = false;
   loading = true;
   dropdownOtvoren = false;
+  generisanjeVidljivo = false;
+  odabraniKoncertZaKarte: Koncert | null = null;
+  cenaKarata: number = 0;
 
   noviKoncert: Koncert = {
     naziv: '',
@@ -44,7 +48,8 @@ export class KoncertiComponent implements OnInit {
     private lokacijaService: LokacijaService,
     private izvodjacService: IzvodjacService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -237,4 +242,39 @@ export class KoncertiComponent implements OnInit {
     }
     return 'Nepoznat izvođač';
   }
+
+prikaziGenerisanje(koncert: Koncert): void {
+    this.odabraniKoncertZaKarte = koncert;
+    this.generisanjeVidljivo = true;
+    this.cenaKarata = 0;
+}
+
+generisiKarte(): void {
+    if (!this.odabraniKoncertZaKarte?.id) return;
+    
+    this.koncertService.generisiKarte(
+        this.odabraniKoncertZaKarte.id,
+        this.cenaKarata
+    ).subscribe({
+        next: (odgovor) => {
+            this.notificationService.success(odgovor.poruka);
+            this.generisanjeVidljivo = false;
+            this.odabraniKoncertZaKarte = null;
+        },
+        error: (err) => {
+            this.notificationService.error(
+                typeof err.error === 'string'
+                    ? err.error
+                    : 'Greška pri generisanju karata.'
+            );
+        }
+    });
+}
+
+zatvoriGenerisanje(): void {
+    this.generisanjeVidljivo = false;
+    this.odabraniKoncertZaKarte = null;
+    this.cenaKarata = 0;
+}
+
 }

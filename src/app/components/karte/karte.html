@@ -73,7 +73,7 @@
             @if (karta.status === 'DOSTUPNA') {
               <button class="btn-success" (click)="prikaziKupovinu(karta.id!)">Kupi</button>
             }
-            @if (karta.status === 'PRODATA') {
+            @if (karta.status === 'PRODATA' && authService.jeAdmin()) {
               <button class="btn-danger" (click)="storniraj(karta.id!)">Storniraj</button>
             }
           </td>

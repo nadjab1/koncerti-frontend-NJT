@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Grad } from '../../models/grad.model';
 import { GradService } from '../../services/grad.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-gradovi',
@@ -24,7 +25,8 @@ export class GradoviComponent implements OnInit {
   constructor(
     private gradService: GradService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {

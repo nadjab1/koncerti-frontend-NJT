@@ -1,8 +1,10 @@
 <div class="header-row">
   <h1>Izvođači</h1>
   <div style="display: flex; gap: 1rem;">
-    <button class="btn-primary" (click)="prikaziFormu('MUZICAR')">+ Dodaj muzičara</button>
-    <button class="btn-primary" (click)="prikaziFormu('BEND')">+ Dodaj bend</button>
+    @if (authService.jeAdmin()) {
+      <button class="btn-primary" (click)="prikaziFormu('MUZICAR')">+ Dodaj muzičara</button>
+      <button class="btn-primary" (click)="prikaziFormu('BEND')">+ Dodaj bend</button>
+    }
   </div>
 </div>
 
@@ -82,24 +84,20 @@
         </tr>
       </thead>
       <tbody>
-        @for (izvodjac of izvodjaci; track izvodjac.id) {
-          <tr>
-            <td>{{ izvodjac.id }}</td>
-            <td>{{ izvodjac.tip }}</td>
-            <td>
-              @if (izvodjac.tip === 'MUZICAR') {
-                {{ izvodjac.ime }} {{ izvodjac.prezime }}
-              } @else {
-                {{ izvodjac.naziv }}
-              }
-            </td>
-            <td>{{ izvodjac.kontaktEmail }}</td>
+      @for (izvodjac of izvodjaci; track izvodjac.id) {
+        <tr>
+          <td>{{ izvodjac.id }}</td>
+          <td>{{ izvodjac.tip }}</td>
+          <td>{{ izvodjacNaziv(izvodjac) }}</td>
+          <td>{{ izvodjac.kontaktEmail }}</td>
+          @if (authService.jeAdmin()) {
             <td>
               <button class="btn-danger" (click)="obrisi(izvodjac.id!)">Obriši</button>
             </td>
-          </tr>
-        }
-      </tbody>
+          }
+        </tr>
+      }
+    </tbody>
     </table>
   }
 }

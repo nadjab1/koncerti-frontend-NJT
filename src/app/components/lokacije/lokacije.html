@@ -1,6 +1,8 @@
 <div class="header-row">
   <h1>Lokacije</h1>
-  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj lokaciju</button>
+  @if (authService.jeAdmin()) {
+    <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj lokaciju</button>
+  }
 </div>
 
 @if (loading) {
@@ -74,7 +76,9 @@
           <th>Adresa</th>
           <th>Kapacitet</th>
           <th>Grad</th>
-          <th>Akcije</th>
+          @if (authService.jeAdmin()) {
+            <th>Akcije</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -85,10 +89,12 @@
             <td>{{ lokacija.adresa }}</td>
             <td>{{ lokacija.kapacitet }}</td>
             <td>{{ lokacija.grad.naziv }}</td>
-            <td style="display: flex; gap: 0.5rem;">
-              <button class="btn-primary" (click)="uredi(lokacija)">Uredi</button>
-              <button class="btn-danger" (click)="obrisi(lokacija.id!)">Obriši</button>
-            </td>
+            @if (authService.jeAdmin()) {
+              <td style="display: flex; gap: 0.5rem;">
+                <button class="btn-primary" (click)="uredi(lokacija)">Uredi</button>
+                <button class="btn-danger" (click)="obrisi(lokacija.id!)">Obriši</button>
+              </td>
+            }
           </tr>
         }
       </tbody>

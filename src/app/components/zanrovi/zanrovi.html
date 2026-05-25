@@ -1,6 +1,8 @@
 <div class="header-row">
   <h1>Žanrovi</h1>
-  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj žanr</button>
+  @if (authService.jeAdmin()) {
+    <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj žanr</button>
+  }
 </div>
 
 @if (loading) {
@@ -31,7 +33,9 @@
         <tr>
           <th>ID</th>
           <th>Naziv</th>
-          <th>Akcije</th>
+          @if (authService.jeAdmin()) {
+            <th>Akcije</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -39,9 +43,11 @@
           <tr>
             <td>{{ zanr.id }}</td>
             <td>{{ zanr.naziv }}</td>
-            <td>
-              <button class="btn-danger" (click)="obrisi(zanr.id!)">Obriši</button>
-            </td>
+            @if (authService.jeAdmin()) {
+              <td>
+                <button class="btn-danger" (click)="obrisi(zanr.id!)">Obriši</button>
+              </td>
+            }
           </tr>
         }
       </tbody>

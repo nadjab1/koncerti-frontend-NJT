@@ -6,6 +6,7 @@ import { KoncertService } from '../../services/koncert.service';
 import { NotificationService } from '../../services/notification.service';
 import { Karta } from '../../models/karta.model';
 import { Koncert } from '../../models/koncert.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-karte',
@@ -31,7 +32,8 @@ export class KarteComponent implements OnInit {
     private kartaService: KartaService,
     private koncertService: KoncertService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {

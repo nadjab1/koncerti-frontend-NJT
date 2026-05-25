@@ -7,6 +7,7 @@ export interface Korisnik {
   ime?: string;
   prezime?: string;
   email?: string;
+  uloga?: string;
 }
 
 export interface LoginRequest {
@@ -20,6 +21,7 @@ export interface AuthResponse {
   ime: string;
   prezime: string;
   email: string;
+  uloga?: string;
 }
 
 export interface RegistracijaRequest {
@@ -52,11 +54,16 @@ export class AuthService {
           id: odgovor.id,
           ime: odgovor.ime,
           prezime: odgovor.prezime,
-          email: odgovor.email
+          email: odgovor.email,
+          uloga: odgovor.uloga
         };
         this.sacuvajKorisnika(korisnik, odgovor.token);
       })
     );
+  }
+
+  jeAdmin(): boolean {
+    return this._korisnik()?.uloga === 'ADMIN';
   }
 
   registracija(podaci: RegistracijaRequest): Observable<AuthResponse> {

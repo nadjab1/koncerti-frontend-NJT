@@ -1,6 +1,8 @@
 <div class="header-row">
   <h1>Gradovi</h1>
-  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj grad</button>
+  @if (authService.jeAdmin()) {
+    <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj grad</button>
+  }
 </div>
 
 @if (loading) {
@@ -39,17 +41,19 @@
         </tr>
       </thead>
       <tbody>
-        @for (grad of gradovi; track grad.id) {
-          <tr>
-            <td>{{ grad.id }}</td>
-            <td>{{ grad.naziv }}</td>
+      @for (grad of gradovi; track grad.id) {
+        <tr>
+          <td>{{ grad.id }}</td>
+          <td>{{ grad.naziv }}</td>
+          @if (authService.jeAdmin()) {
             <td style="display: flex; gap: 0.5rem;">
               <button class="btn-primary" (click)="uredi(grad)">Uredi</button>
               <button class="btn-danger" (click)="obrisi(grad.id!)">Obriši</button>
             </td>
-          </tr>
-        }
-      </tbody>
+          }
+        </tr>
+      }
+    </tbody>
     </table>
   }
 }

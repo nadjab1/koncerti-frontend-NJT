@@ -1,6 +1,8 @@
 <div class="header-row">
   <h1>Koncerti</h1>
-  <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj koncert</button>
+  @if (authService.jeAdmin()) {
+    <button class="btn-primary" (click)="prikaziFormu()">+ Dodaj koncert</button>
+  }
 </div>
 
 @if (loading) {
@@ -103,6 +105,31 @@
     </form>
   }
 
+  @if (generisanjeVidljivo) {
+    <div style="background: white; padding: 1.5rem; border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; max-width: 500px;">
+      <h3 style="margin-bottom: 1rem; color: #1a1a2e;">
+        Generiši karte — {{ odabraniKoncertZaKarte?.naziv }}
+      </h3>
+      <p style="margin-bottom: 1rem; color: #666; font-size: 0.9rem;">
+        Lokacija: {{ odabraniKoncertZaKarte?.lokacija?.naziv }}
+        (kapacitet: {{ odabraniKoncertZaKarte?.lokacija?.kapacitet }})
+      </p>
+      <label>Cena karte (RSD)</label>
+      <input
+        type="number"
+        [(ngModel)]="cenaKarata"
+        name="cenaKarata"
+        placeholder="npr. 2000"
+        style="margin-bottom: 1rem;"
+      />
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn-success" (click)="generisiKarte()">Generiši</button>
+        <button class="btn-danger" (click)="zatvoriGenerisanje()">Otkaži</button>
+      </div>
+    </div>
+  }
+
   @if (koncerti.length === 0) {
     <p>Nema koncerata u bazi.</p>
   } @else {
@@ -145,9 +172,12 @@
                 <span style="color: #aaa;">Nema</span>
               }
             </td>
-            <td style="display: flex; gap: 0.5rem;">
-              <button class="btn-primary" (click)="uredi(koncert)">Uredi</button>
-              <button class="btn-danger" (click)="obrisi(koncert.id!)">Obriši</button>
+            <td style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              @if (authService.jeAdmin()) {
+                <button class="btn-primary" (click)="uredi(koncert)">Uredi</button>
+                <button class="btn-danger" (click)="obrisi(koncert.id!)">Obriši</button>
+                <button class="btn-success" (click)="prikaziGenerisanje(koncert)">🎫 Karte</button>
+              }
             </td>
           </tr>
         }
